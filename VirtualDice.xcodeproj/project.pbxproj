@@ -57,11 +57,11 @@
 			isa = PBXGroup;
 			children = (
 				25A9671F264B58BA005AF467 /* AppDelegate.swift */,
-				25A96721264B58BA005AF467 /* art.scnassets */,
 				25A96723264B58BA005AF467 /* ViewController.swift */,
 				25A96725264B58BA005AF467 /* Main.storyboard */,
-				25A96728264B58BB005AF467 /* Assets.xcassets */,
 				25A9672A264B58BB005AF467 /* LaunchScreen.storyboard */,
+				25A96721264B58BA005AF467 /* art.scnassets */,
+				25A96728264B58BB005AF467 /* Assets.xcassets */,
 				25A9672D264B58BB005AF467 /* Info.plist */,
 			);
 			path = VirtualDice;
