@@ -10,12 +10,15 @@ import SceneKit
 import ARKit
 
 class ViewController: UIViewController, ARSCNViewDelegate {
+    
+    var diceArray = [SCNNode]()
 
     @IBOutlet var sceneView: ARSCNView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //puts yellow dots on the horizontal surfaces if the view BELOW
         self.sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
         
         // Set the view's delegate
@@ -73,14 +76,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         if let touch = touches.first {
             let touchLocation = touch.location(in: sceneView)
             
-//      Deprication Devistation
-//            let results = sceneview.hitTest(touchLocation, option: nil)
-//            if !results.isEmpty {
-//                print("touched the plane")
-//            } else {
-//                print("not good touched")
-//            }
-            
             let query: ARRaycastQuery? = sceneView.raycastQuery(from: touchLocation, allowing: .existingPlaneGeometry, alignment: .horizontal)
             guard let nonOptQuery = query else {
                 print("Query is nil")
@@ -102,11 +97,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                         y: hitResult!.worldTransform.columns.3.y + diceNode.boundingSphere.radius,
                         z: hitResult!.worldTransform.columns.3.z
                     )
-                
-                            sceneView.scene.rootNode.addChildNode(diceNode)
-                        } else {
-                            fatalError("Error in getting diceNode to get onto the scene")
-                        }
+                    
+                    diceArray.append(diceNode)
+                    
+                    sceneView.scene.rootNode.addChildNode(diceNode)
+                    
+                    roll(dice: diceNode)
+                    
+                } else {
+                    fatalError("Error in getting diceNode to get onto the scene")
+                }
                 
                 
             } else {
@@ -118,8 +118,44 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
     }
     
+    func rollAll() {
+        if !diceArray.isEmpty {
+            for dice in diceArray {
+                roll(dice: dice)
+            }
+        }
+    }
     
+    func roll(dice: SCNNode) {
+        let randomX = Float(arc4random_uniform(4) + 1) * (Float.pi/2)
+        let randomZ = Float(arc4random_uniform(4) + 1) * (Float.pi/2)
 
+        dice.runAction(SCNAction.rotateBy(
+                            x: CGFloat(randomX * 4),
+                            y: 0,
+                            z: CGFloat(randomZ * 4),
+                            duration: 0.5)
+        )
+    }
+    
+    
+    @IBAction func rollAgain(_ sender: UIBarButtonItem) {
+        rollAll()
+    }
+    
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        rollAll()
+    }
+    
+    @IBAction func removeAllDice(_ sender: UIBarButtonItem) {
+        if !diceArray.isEmpty {
+            for dice in diceArray {
+                dice.removeFromParentNode()
+            }
+        }
+    }
+    
+    
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
       
         if anchor is ARPlaneAnchor {
